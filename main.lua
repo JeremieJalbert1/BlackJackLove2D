@@ -5,7 +5,6 @@ function love.load()
     love.window.setMode(1200, 800, {fullscreen = false})
     
     game = Game.new()
-    game:dealHand()
 end
 
 function love.update(deltaTime)

@@ -1,6 +1,11 @@
 Option = {}
 Option.__index = Option
 
+Option.states = {
+    ACTIVE = "ACTIVE",
+    INACTIVE = "INACTIVE"
+}
+
 function Option.new(text, x, y, width, height, action)
     local self = setmetatable({}, Option)
     self.text = text
@@ -8,13 +13,17 @@ function Option.new(text, x, y, width, height, action)
     self.y = y
     self.width = width
     self.height = height
-    self.enabled = true
-    self.action = action  -- This should be a function that defines the action when the option is chosen
+    self.state = Option.states.INACTIVE
+    self.action = action
     return self
 end
 
+function Option:setState(state)
+    self.state = Option.states[state]
+end
+
 function Option:draw()
-    if not self.enabled then
+    if self.state == Option.states.INACTIVE then
         love.graphics.setColor(0.8, 0.8, 0.8, 0.5) -- Disabled: lower opacity (0.5)
     else
         love.graphics.setColor(0.8, 0.8, 0.8, 1) -- Enabled: full opacity
@@ -34,13 +43,9 @@ function Option:isMouseOver()
 end
 
 function Option:clicked()
-    if self:isMouseOver() and self.enabled then
+    if self:isMouseOver() and self.state == Option.states.ACTIVE then
         self.action()
     end
-end
-
-function Option:changeState(state)
-    self.enabled = state
 end
 
 return Option

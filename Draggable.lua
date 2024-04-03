@@ -19,12 +19,12 @@ end
 function Draggable:update(dt)
     if self.isDragging then
         -- Interpolate the current position towards the target position
-        local lerpFactor = 0.09
+        local lerpFactor = 0.07
         self.vec2d.x = self.vec2d.x + (self.targetVec2d.x - self.vec2d.x) * lerpFactor
         self.vec2d.y = self.vec2d.y + (self.targetVec2d.y - self.vec2d.y) * lerpFactor
     end
     if not self.isDragging then
-        local resetSpeedPos = 0.1 -- Adjust this value as needed
+        local resetSpeedPos = 0.07 -- Adjust this value as needed
         local resetSpeedAngle = 3.5 -- Adjust this value as needed
         -- LERP for position
         if math.abs(self.vec2d.x - self.vec2dOriginal.x) > 0.1 or math.abs(self.vec2d.y - self.vec2dOriginal.y) > 0.1 then

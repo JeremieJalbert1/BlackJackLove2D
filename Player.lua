@@ -1,17 +1,43 @@
 local displayConstant = require("DisplayConstant")
 local Helper = require("Helper")
+local Options = require("Options")
 
 local Player = {}
 Player.__index = Player
 
-function Player.new()
+Player.states = {
+    PLAYING = "PLAYING",
+    WAITING = "WAITING",
+    PRINTING = "PRINTING",
+}
+
+function Player.new(dealer)
     local self = setmetatable({}, Player)
     self.hand = {}
     self.bet = 0
-    self.isTurn = false
+    self.state = Player.states.WAITING
     self.result = nil
+    self.options = Options.new(self, dealer)
 
     return self
+end
+
+function Player:setState(state)
+    self.state = Player.states[state]
+end
+
+function Player:update(dt, dealer)
+    for _, card in ipairs(self.hand) do
+        card:update(dt)
+    end
+    
+    if self.state == Player.states.PLAYING then
+        self.state = Player.states.PRINTING
+    elseif self.state == Player.states.PRINTING then
+        self.options:setStates("ACTIVE")
+    elseif self.state == Player.states.WAITING then
+        self.options:setStates("INACTIVE")
+    end
 end
 
 function Player:setCardPositionForHand()
@@ -44,11 +70,12 @@ end
 function Player:hit(dealer)
     local card = dealer:dealCard()
     self:addCard(card)
-    self:handState()
+    self:handState(dealer)
 end
 
-function Player:stay()
-    self.isTurn = false
+function Player:stay(dealer)
+    self.state = Player.states.WAITING
+    dealer:setState("PLAYING")
 end
 
 function Player:double(dealer)
@@ -74,18 +101,17 @@ end
 function Player:draw()
     self:displayHand()
     self:displayHandTotal()
+    self.options:draw()
 end
 
-function Player:handState()
+function Player:handState(dealer)
     if Helper.isBlackjack(self.hand) then
-        self.isTurn = false
-        self.result = "Blackjack"
+        self.state = Player.states.WAITING
     elseif Helper.isBust(self.hand) then
-        self.isTurn = false
-        self.result = "Bust"
+        self.state = Player.states.WAITING
+        dealer:setState("PLAYING")
     elseif Helper.calculateHandTotal(self.hand) == 21 then
-        self.isTurn = false
-        self.result = "21"
+        self.state = Player.states.WAITING
     end
 end
 
