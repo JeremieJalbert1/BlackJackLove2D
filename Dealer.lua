@@ -39,7 +39,7 @@ function Dealer:update(dt, player, hand)
         self.actionTimer = self.actionTimer - dt
     end
 
-    if self.state == Dealer.states.IDLE and self.actionTimer <= 0 then
+    if self.state == Dealer.states.IDLE and not player.state == "BETTING" and self.actionTimer <= 0 then
         -- Transition from IDLE directly involves dealing or preparing to deal
         self:startDealing()
         self.state = Dealer.states.DEALING

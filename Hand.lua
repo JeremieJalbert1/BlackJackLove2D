@@ -4,7 +4,8 @@ Hand.__index = Hand
 Hand.states = {
     PLAYING = "PLAYING",
     WAITING = "WAITING",
-    FINISHED = "FINISHED"
+    FINISHED = "FINISHED",
+    BETTING = "BETTING"
 }
 
 function Hand.new()

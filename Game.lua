@@ -36,22 +36,15 @@ function Game:draw()
 end
 
 function Game:mousepressed(x, y, button, istouch, presses)
-    self.player.options:mousepressed(x, y, button)
-    for _, card in pairs(self.player.hand) do
-        card:mousepressed(x, y, button)
-    end
+    self.player:mousepressed(x, y, button)
 end
 
 function Game:mousereleased(x, y, button, istouch, presses)
-    for _, card in pairs(self.player.hand) do
-        card:mousereleased(x, y, button)
-    end
+    self.player:mousereleased(x, y, button)
 end
 
 function Game:mousemoved(x, y, dx, dy, istouch)
-    for _, card in pairs(self.player.hand) do
-        card:mousemoved(x, y, dx, dy)
-    end
+    self.player:mousemoved(x, y, dx, dy)
 end
 
 return Game

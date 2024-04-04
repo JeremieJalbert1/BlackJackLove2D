@@ -1,6 +1,8 @@
 local displayConstant = require("DisplayConstant")
 local Helper = require("Helper")
 local Options = require("Options")
+local Chip = require("Chip")
+local Vec2d = require("Vec2d")
 
 local Player = {}
 Player.__index = Player
@@ -9,15 +11,19 @@ Player.states = {
     PLAYING = "PLAYING",
     WAITING = "WAITING",
     PRINTING = "PRINTING",
+    BETTING = "BETTING"
 }
 
 function Player.new(dealer)
     local self = setmetatable({}, Player)
     self.hand = {}
+    self.money = 1000
     self.bet = 0
-    self.state = Player.states.WAITING
+    self.state = Player.states.BETTING
     self.result = nil
     self.options = Options.new(self, dealer)
+    self.chips = {}
+    self:createChips()
 
     return self
 end
@@ -30,13 +36,23 @@ function Player:update(dt, dealer)
     for _, card in ipairs(self.hand) do
         card:update(dt)
     end
-    
+    for _, chip in ipairs(self.chips) do
+        chip:update(dt)
+    end
     if self.state == Player.states.PLAYING then
         self.state = Player.states.PRINTING
     elseif self.state == Player.states.PRINTING then
         self.options:setStates("ACTIVE")
     elseif self.state == Player.states.WAITING then
         self.options:setStates("INACTIVE")
+    end
+end
+
+function Player:createChips()
+    local amount = self.money/10
+
+    for i = 1, 10 do
+        table.insert(self.chips, Chip.new(Vec2d:new(100, 100), amount))
     end
 end
 
@@ -102,6 +118,9 @@ function Player:draw()
     self:displayHand()
     self:displayHandTotal()
     self.options:draw()
+    for _, chip in ipairs(self.chips) do
+        chip:draw(100, 100)
+    end
 end
 
 function Player:handState(dealer)
@@ -112,6 +131,35 @@ function Player:handState(dealer)
         dealer:setState("PLAYING")
     elseif Helper.calculateHandTotal(self.hand) == 21 then
         self.state = Player.states.WAITING
+    end
+end
+
+function Player:mousepressed(x, y, button)
+    for _, chip in ipairs(self.chips) do
+        chip:mousepressed(x, y, button)
+    end
+    self.options:mousepressed(x, y, button)
+    
+    for _, card in pairs(self.hand) do
+        card:mousepressed(x, y, button)
+    end
+end
+
+function Player:mousereleased(x, y, button)
+    for _, chip in ipairs(self.chips) do
+        chip:mousereleased(x, y, button)
+    end
+    for _, card in pairs(self.hand) do
+        card:mousereleased(x, y, button)
+    end
+end
+
+function Player:mousemoved(x, y, dx, dy)
+    for _, chip in ipairs(self.chips) do
+        chip:mousemoved(x, y, dx, dy)
+    end
+    for _, card in pairs(self.hand) do
+        card:mousemoved(x, y, dx, dy)
     end
 end
 
