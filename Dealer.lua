@@ -110,18 +110,18 @@ function Dealer:setHandPosition()
 
     for i, card in ipairs(self.hand) do
         local x = startX + (i - 1) * (displayConstant.CARD_WIDTH + displayConstant.SPACING_X)
-        card.vec2dOriginal:set(x, startY)
+        card.positionOriginal:set(x, startY)
         if card.isDragging then
             return
         else
-            card.targetVec2d:set(x, startY)
+            card.targetPosition:set(x, startY)
         end
     end
 end
 
 function Dealer:displayHand()
     for i, card in ipairs(self.hand) do
-        card:draw(card.vec2d.x, card.vec2d.y)
+        card:draw(card.position.x, card.position.y)
     end
 end
 

@@ -2,13 +2,16 @@ local Game = require("Game")
 
 function love.load()
     math.randomseed(os.time())
-    love.window.setMode(1200, 800, {fullscreen = false})
+    love.window.setMode(1200, 800, {fullscreen = true})
     
     game = Game.new()
 end
 
 function love.update(deltaTime)
     game:update(deltaTime)
+    if game.quit then
+        love.event.quit()
+    end
 end
 
 function love.draw()
@@ -30,3 +33,9 @@ end
 function love.mousemoved(x, y, dx, dy, istouch)
     game:mousemoved(x, y, dx, dy)
 end
+
+function love.keypressed(k)
+    if k == 'escape' then
+       love.event.quit()
+    end
+ end

@@ -51,12 +51,13 @@ end
 function Player:createChips()
     local amount = self.money/10
 
-    for i = 1, 10 do
+    for i = 1, 1 do
         table.insert(self.chips, Chip.new(Vec2d:new(100, 100), amount))
     end
+    self:setChipsPosition()
 end
 
-function Player:setCardPositionForHand()
+function Player:setCardPosition()
     local screenWidth = love.graphics.getWidth()
     local totalHandWidth = (#self.hand * displayConstant.CARD_WIDTH) +
                            ((#self.hand - 1) * displayConstant.SPACING_X)
@@ -65,18 +66,37 @@ function Player:setCardPositionForHand()
 
     for i, card in ipairs(self.hand) do
         local x = startX + (i - 1) * (displayConstant.CARD_WIDTH + displayConstant.SPACING_X)
-        card.vec2dOriginal:set(x, startY)
+        card.positionOriginal:set(x, startY)
         if card.isDragging then
             return
         else
-            card.targetVec2d:set(x, startY)
+            card.targetPosition:set(x, startY)
         end
     end
 end
 
+function Player:setChipsPosition()
+    local screenWidth = love.graphics.getWidth()
+    local totalChipsWidth = (#self.chips * displayConstant.CHIP_WIDTH) +
+                            ((#self.chips - 1) * displayConstant.SPACING_X)
+    local startX = (screenWidth - totalChipsWidth) / 4
+    local startY = love.graphics.getHeight() - displayConstant.CHIP_HEIGHT - displayConstant.BOTTOM_MARGIN
+
+    for i, chip in ipairs(self.chips) do
+        local x = startX + (i - 1) * (displayConstant.CHIP_WIDTH + displayConstant.SPACING_X)
+        chip.positionOriginal:set(x, startY)
+        if chip.isDragging then
+            return
+        else
+            chip.targetPosition:set(x, startY)
+        end
+    end
+
+end
+
 function Player:addCard(card)
     table.insert(self.hand, card)
-    self:setCardPositionForHand()
+    self:setCardPosition()
 end
 
 function Player:setBet(amount)
@@ -106,7 +126,7 @@ end
 
 function Player:displayHand()
     for i, card in ipairs(self.hand) do
-        card:draw(card.vec2d.x, card.vec2d.y)
+        card:draw(card.position.x, card.position.y)
     end
 end
 

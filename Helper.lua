@@ -1,5 +1,6 @@
 local Helper = {}
 
+
 function Helper.calculateHandTotal(hand)
     local total = 0
     local aceCount = 0
@@ -59,6 +60,14 @@ function Helper.whichHandWon(playerHand, dealerHand)
     else
         return "Push"
     end
+end
+
+function Helper.isColliding(object1, object2)
+    return object1.position.x < object2.position.x + object2.width and
+           object2.position.x < object1.position.x + object1.width and
+           object1.position.y < object2.position.y + object2.height and
+           object2.position.y < object1.position.y + object1.height
+
 end
 
 return Helper

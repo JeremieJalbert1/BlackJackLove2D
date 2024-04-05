@@ -2,6 +2,8 @@ local Deck = require("Deck")
 local Player = require("Player")
 local Dealer = require("Dealer")
 local Hand = require("Hand")
+local BetZone = require("BetZone")
+local Helper  = require("Helper")
 
 Game = {}
 Game.__index = Game
@@ -13,6 +15,7 @@ function Game.new()
     self.dealer = Dealer.new(self.deck)
     self.player = Player.new(self.dealer)
     self.hand = Hand.new()
+    self.betZone = BetZone.new()
     self.dealer:startDealing()
 
     return self
@@ -33,6 +36,8 @@ function Game:draw()
     self.dealer:displayHand()
 
     self.dealer:displayHandTotal() -- dealer
+    self.betZone:draw()
+    
 end
 
 function Game:mousepressed(x, y, button, istouch, presses)
@@ -41,6 +46,11 @@ end
 
 function Game:mousereleased(x, y, button, istouch, presses)
     self.player:mousereleased(x, y, button)
+    for _, chip in ipairs(self.player.chips) do
+        if Helper.isColliding(chip, self.betZone) then
+            self.betZone:addChip(chip)
+        end
+    end
 end
 
 function Game:mousemoved(x, y, dx, dy, istouch)

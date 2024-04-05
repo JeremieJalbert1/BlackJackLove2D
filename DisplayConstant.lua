@@ -6,7 +6,10 @@ local constant = {
     SPACING_Y = 200,  -- Vertical spacing between hands
     SPACING_X = 20,  -- Horizontal spacing between cards
     BOTTOM_MARGIN = 100,  -- Margin from the bottom of the screen for the player's hand
-    TOP_MARGIN = 100  -- Margin from the top of the screen for the dealer's hand
+    TOP_MARGIN = 100,  -- Margin from the top of the screen for the dealer's hand
+    CHIP_WIDTH = 64,  -- Assume each chip has a width of 64 pixels for spacing
+    CHIP_HEIGHT = 72,  -- Assume each chip has a height of 72 pixels for spacing
 }
+
 
 return constant
