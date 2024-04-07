@@ -10,6 +10,7 @@ function Deck.new()
     self.quad = love.graphics.newQuad(88, 0, 88, 140, self.image:getDimensions())
     self.position = Vec2d:new(50, love.graphics.getHeight() / 2 - 70)
     self.cards = {}
+    self.cardsInDeck = 52
     self:generate()
     return self
 end
@@ -56,6 +57,7 @@ end
 function Deck:dealCard(isFaceUp)
     local card = table.remove(self.cards)
     card.isFaceUp = isFaceUp
+    self.cardsInDeck = self.cardsInDeck - 1
     return card
 end
 

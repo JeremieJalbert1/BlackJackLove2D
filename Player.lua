@@ -125,7 +125,6 @@ end
 
 function Player:stay(dealer)
     self.state = Player.states.WAITING
-    dealer:setState("PLAYING")
 end
 
 function Player:double(dealer)

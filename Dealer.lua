@@ -12,20 +12,25 @@ Dealer.states = {
     WAITING = "WAITING",
 }
 
+-- TODO: IF DECK IS EMPTY PERFECTLY AFTER THE HAND, THE LAST CARDS STAYS IN THE DECK.
+-- TODO: REPOPULATE THE DECK IS NOT WORKING PROPERLY
+
 function Dealer.new(deck)
     local self = setmetatable({}, Dealer)
     self.deck = deck or Deck.new()
     self.hand = {}
+    self.endDeck = {}
     self.state = Dealer.states.IDLE
 
     self.dealIndex = 0
     self.actionTimer = 0
-    self.actionDelay = 1
+    self.actionDelay = 0.5
 
     self.chips = {}
     self.money = 1000
     
     self:shuffleDeck()
+    self:startDealing()
     return self
 end
 
@@ -41,32 +46,36 @@ function Dealer:update(dt, player, hand)
     if self.actionTimer > 0 then
         self.actionTimer = self.actionTimer - dt
     end
-
-    if self.state == Dealer.states.IDLE and not player.state == "BETTING" and self.actionTimer <= 0 then
-        -- Transition from IDLE directly involves dealing or preparing to deal
+    if self.state == Dealer.states.IDLE then
         self:startDealing()
-        self.state = Dealer.states.DEALING
-        self.actionTimer = self.actionDelay -- Reset the timer for the action delay
-    elseif self.state == Dealer.states.DEALING and self.actionTimer <= 0 then
-        -- Deal cards and maybe transition to PLAYING or another state that requires delay
+    end
+    if self.state == Dealer.states.DEALING and self.actionTimer <= 0 then
         self:dealHand(player)
         self.actionTimer = self.actionDelay
     elseif self.state == Dealer.states.PLAYING and self.actionTimer <= 0 then
-        -- Execute turn actions and consider what's next; possibly return to IDLE
         self:turnActions(hand)
         self.actionTimer = self.actionDelay
     end
 end
 
+function Dealer:resetHand(player)
+    for key, card in ipairs(self.hand) do
+        self.endDeck[key] = card
+        self.hand[key] = nil
+    end
+    for key, card in ipairs(player.hand) do
+        self.endDeck[key] = card
+        player.hand[key] = nil
+    end
+end
+
 function Dealer:playerWon(player)
-    print(player.bet, player.money)
     player.money = player.money + player.bet * 2
     self.money = self.money - player.bet
-    peint(player.bet, player.money)
+    print(player.bet, player.money)
 end
 
 function Dealer:startDealing()
-    self.state = Dealer.states.DEALING
     self.dealIndex = 0
     self.dealTimer = self.dealDelay
 end
@@ -104,6 +113,12 @@ function Dealer:dealHand(player)
 end
 
 function Dealer:dealCard(isFaceUp)
+    if #self.deck.cards == 0 then
+        self.deck.cards = self.endDeck
+        self.endDeck = {}
+        self:shuffleDeck()
+    end
+    print(#self.deck.cards)
     return self.deck:dealCard(isFaceUp)
 end
 
@@ -151,9 +166,8 @@ function Dealer:turnActions(hand)
     self:flipCard()
     if self:shouldHit() then
         self:addCard(self:dealCard())
-    else
-        self.state = Dealer.states.WAITING
-        hand:setState("FINISHED")
+    else 
+        hand:setState("RESETTING")
     end
 end
 

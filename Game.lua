@@ -22,9 +22,6 @@ function Game.new()
     
     self.startGame = Option.new("Start Game", 100, 500, 100, 50, function ()
         self.hand:setState("DEALING")
-        self.betZone:setStates("INACTIVE")
-        self.dealer:setState("DEALING")
-        self.player:setState("WAITING")
         self.startGame:setState("INACTIVE")
     end, "ACTIVE")
 
@@ -34,11 +31,39 @@ end
 function Game:update(dt)
     self.dealer:update(dt, self.player, self.hand)
     self.player:update(dt, self.dealer)
-    self.hand:update(dt, self.player, self.dealer)
+end
+
+function Game:checkActorsState()
+    if self.hand.state == "DEALING" then -- DEALING PHASE
+        self.betZone:setStates("INACTIVE")
+        self.dealer:setState("DEALING")
+        self.hand:setState("PLAYING")
+
+    elseif self.hand.state == "FINISHED" then -- FINISHED PHASE
+        self.hand:setState("BETTING")
+        self.startGame:setState("ACTIVE")
+        self.dealer:setState("IDLE")
+
+    elseif self.hand.state == "PLAYER" then -- PLAYER PHASE
+        self.dealer:setState("WAITING")
+        self.player:setState("PLAYING")
+
+    elseif self.hand.state == "BETTING" then -- BETTING PHASE
+        self.betZone:setStates("ACTIVE")
+        self.player:setState("BETTING")
+
+    elseif self.hand.state == "RESETTING" then -- RESETTING PHASE
+        self.hand:checkResult(self.player, self.dealer)
+
+    elseif self.hand.state == "DEALER" or self.player.state == "WAITING" then
+        self.dealer:setState("PLAYING")
+    end
 end
 
 function Game:draw()
     self.deck:draw(100, 100)
+
+    self:checkActorsState()
  
     self.player:draw()
     self.dealer:displayHand()

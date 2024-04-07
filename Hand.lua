@@ -4,9 +4,11 @@ local Hand = {}
 Hand.__index = Hand
 
 Hand.states = {
-    PLAYING = "PLAYING",
-    WAITING = "WAITING",
+    PLAYER = "PLAYER",
+    DEALER = "DEALER",
+    DEALING = "DEALING",
     FINISHED = "FINISHED",
+    RESETTING = "RESETTING",
     BETTING = "BETTING"
 }
 
@@ -37,25 +39,25 @@ function Hand:setResult(result)
     self.result = Hand.results[result]
 end
 
-function Hand:update(dt, player, dealer)
-    if self.state == Hand.states.FINISHED then
-        self:checkResult(player, dealer)
-    end
-    
-end
-
 function Hand:playerBet(chip, player, betZone)
     player:placeBet(chip)
     betZone:addChip(chip)
 end
 
+function Hand:resetHand(player, dealer)
+    dealer:resetHand(player)
+    self.cards = {}
+    self.result = nil
+    self:setState(Hand.states.FINISHED)
+end
+
 function Hand:checkResult(player, dealer)
     if self.result == nil then
-        print("Checking result")
         self:setResult(Helper.whichHandWon(player.hand, dealer.hand))
     end
 
     if self.result == Hand.results.WIN then
+        print("WIN")
         dealer:playerWon(player)
     elseif self.result == Hand.results.LOSE then
         print("LOSE")
@@ -66,7 +68,8 @@ function Hand:checkResult(player, dealer)
         print("PUSH")
         player.money = player.money + player.bet
     end
-    self:setState("BETTING")
+    
+    self:resetHand(player, dealer)
 end
 
 return Hand
