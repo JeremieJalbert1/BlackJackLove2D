@@ -66,15 +66,15 @@ function Helper.whichHandWon(playerHand, dealerHand)
     local dealerTotal = Helper.calculateHandTotal(dealerHand)
     
     if playerTotal > 21 then
-        return "Dealer"
+        return "LOSE"
     elseif dealerTotal > 21 then
-        return "Player"
+        return "WIN"
     elseif playerTotal > dealerTotal then
-        return "Player"
+        return "WIN"
     elseif playerTotal < dealerTotal then
-        return "Dealer"
+        return "LOSE"
     else
-        return "Push"
+        return "PUSH"
     end
 end
 

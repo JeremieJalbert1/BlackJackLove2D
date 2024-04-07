@@ -19,8 +19,13 @@ function Game.new()
     self.betZone = BetZone.new()
     self.hand:setState("BETTING")
     self.betZone:setStates("ACTIVE")
-    self.startGame = Option.new("Start Game", 100, 100, 100, 50, function ()
+    
+    self.startGame = Option.new("Start Game", 100, 500, 100, 50, function ()
         self.hand:setState("DEALING")
+        self.betZone:setStates("INACTIVE")
+        self.dealer:setState("DEALING")
+        self.player:setState("WAITING")
+        self.startGame:setState("INACTIVE")
     end, "ACTIVE")
 
     return self
@@ -29,6 +34,7 @@ end
 function Game:update(dt)
     self.dealer:update(dt, self.player, self.hand)
     self.player:update(dt, self.dealer)
+    self.hand:update(dt, self.player, self.dealer)
 end
 
 function Game:draw()
@@ -46,14 +52,15 @@ end
 function Game:mousepressed(x, y, button, istouch, presses)
     self.player:mousepressed(x, y, button)
     self.betZone:mousepressed(x, y, button, self.player)
+    self.startGame:clicked()
 end
 
 function Game:mousereleased(x, y, button, istouch, presses)
     self.player:mousereleased(x, y, button)
+
     for _, chip in ipairs(self.player.chips) do
         if Helper.isColliding(chip, self.betZone) then
-            table.remove(self.player.chips, Helper.findIndex(self.player.chips, chip))
-            self.betZone:addChip(chip)
+            self.hand:playerBet(chip, self.player, self.betZone)
         end
     end
 end

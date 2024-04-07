@@ -17,13 +17,14 @@ Player.states = {
 function Player.new(dealer)
     local self = setmetatable({}, Player)
     self.hand = {}
-    self.money = 1000
     self.bet = 0
     self.state = Player.states.BETTING
     self.result = nil
     self.options = Options.new(self, dealer)
     self.chips = {}
     self:createChips()
+    self.money = 0
+    self:setMoney()
 
     return self
 end
@@ -39,6 +40,8 @@ function Player:update(dt, dealer)
     for _, chip in ipairs(self.chips) do
         chip:update(dt)
     end
+    self:setMoney()
+
     if self.state == Player.states.PLAYING then
         self.state = Player.states.PRINTING
     elseif self.state == Player.states.PRINTING then
@@ -49,12 +52,23 @@ function Player:update(dt, dealer)
 end
 
 function Player:createChips()
-    local amount = self.money/10
-
     for i = 1, 1 do
-        table.insert(self.chips, Chip.new(Vec2d:new(100, 100), amount))
+        table.insert(self.chips, Chip.new(Vec2d:new(100, 100), 100))
     end
     self:setChipsPosition()
+end
+
+function Player:setMoney()
+    self.money = 0
+    for _, chip in ipairs(self.chips) do
+        self.money = self.money + chip.value
+    end
+end
+
+function Player:placeBet(chip)
+    table.remove(self.chips, Helper.findIndex(self.chips, chip))
+    self.bet = self.bet + chip.value
+    self.money = self.money - chip.value
 end
 
 function Player:setCardPosition()
@@ -134,9 +148,14 @@ function Player:displayHandTotal()
     love.graphics.print("Player's Total: " .. Helper.calculateHandTotal(self.hand), 5, love.graphics.getHeight() - displayConstant.CARD_HEIGHT/2 - displayConstant.BOTTOM_MARGIN)
 end
 
+function Player:displayMoney()
+    love.graphics.print("Money: " .. self.money, 5, love.graphics.getHeight() - displayConstant.CARD_HEIGHT/2 - displayConstant.BOTTOM_MARGIN - 20)
+end
+
 function Player:draw()
     self:displayHand()
     self:displayHandTotal()
+    self:displayMoney()
     self.options:draw()
     for _, chip in ipairs(self.chips) do
         chip:draw(100, 100)
@@ -146,6 +165,7 @@ end
 function Player:handState(dealer)
     if Helper.isBlackjack(self.hand) then
         self.state = Player.states.WAITING
+
     elseif Helper.isBust(self.hand) then
         self.state = Player.states.WAITING
         dealer:setState("PLAYING")

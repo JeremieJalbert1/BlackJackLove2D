@@ -42,6 +42,7 @@ function Option:isMouseOver()
     return mouseX >= self.x and mouseX <= self.x + self.width and mouseY >= self.y and mouseY <= self.y + self.height
 end
 
+
 function Option:clicked()
     if self:isMouseOver() and self.state == Option.states.ACTIVE then
         self.action()

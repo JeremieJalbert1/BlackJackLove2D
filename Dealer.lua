@@ -12,7 +12,7 @@ Dealer.states = {
     WAITING = "WAITING",
 }
 
-function Dealer.new(deck, player)
+function Dealer.new(deck)
     local self = setmetatable({}, Dealer)
     self.deck = deck or Deck.new()
     self.hand = {}
@@ -21,6 +21,9 @@ function Dealer.new(deck, player)
     self.dealIndex = 0
     self.actionTimer = 0
     self.actionDelay = 1
+
+    self.chips = {}
+    self.money = 1000
     
     self:shuffleDeck()
     return self
@@ -53,6 +56,13 @@ function Dealer:update(dt, player, hand)
         self:turnActions(hand)
         self.actionTimer = self.actionDelay
     end
+end
+
+function Dealer:playerWon(player)
+    print(player.bet, player.money)
+    player.money = player.money + player.bet * 2
+    self.money = self.money - player.bet
+    peint(player.bet, player.money)
 end
 
 function Dealer:startDealing()
