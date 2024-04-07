@@ -111,7 +111,7 @@ function Dealer:setHandPosition()
     for i, card in ipairs(self.hand) do
         local x = startX + (i - 1) * (displayConstant.CARD_WIDTH + displayConstant.SPACING_X)
         card.positionOriginal:set(x, startY)
-        if card.isDragging then
+        if card.state == "MOVING" then
             return
         else
             card.targetPosition:set(x, startY)

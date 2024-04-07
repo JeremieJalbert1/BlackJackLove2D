@@ -1,5 +1,21 @@
 local Helper = {}
 
+function Helper.objectInTable(object, table)
+    for _, value in ipairs(table) do
+        if object == value then
+            return true
+        end
+    end
+    return false
+end
+
+function Helper.findIndex(object, table)
+    for index, value in ipairs(table) do
+        if value == object then
+            return index
+        end
+    end
+end
 
 function Helper.calculateHandTotal(hand)
     local total = 0

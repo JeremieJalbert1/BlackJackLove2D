@@ -21,9 +21,7 @@ function love.draw()
 end
 
 function love.mousepressed(x, y, button, istouch, presses)
-    if button == 1 then
-        game:mousepressed(x, y, button, istouch, presses)
-    end
+    game:mousepressed(x, y, button, istouch, presses)
 end
 
 function love.mousereleased(x, y, button, istouch, presses)

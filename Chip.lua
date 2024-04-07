@@ -9,10 +9,13 @@ function Chip.new(position, value)
     self.value = value
     self.width = 64
     self.height = 72
-    self.inBetZone = false
     self.quad = self:selectImage(value)
 
     return self
+end
+
+function Chip:returnToPlayer()
+    self.targetPosition = self.originalPosition
 end
 
 function Chip:selectImage(value)

@@ -4,6 +4,7 @@ local Dealer = require("Dealer")
 local Hand = require("Hand")
 local BetZone = require("BetZone")
 local Helper  = require("Helper")
+local Option = require("Option")
 
 Game = {}
 Game.__index = Game
@@ -16,38 +17,42 @@ function Game.new()
     self.player = Player.new(self.dealer)
     self.hand = Hand.new()
     self.betZone = BetZone.new()
-    self.dealer:startDealing()
+    self.hand:setState("BETTING")
+    self.betZone:setStates("ACTIVE")
+    self.startGame = Option.new("Start Game", 100, 100, 100, 50, function ()
+        self.hand:setState("DEALING")
+    end, "ACTIVE")
 
     return self
 end
 
 function Game:update(dt)
-    self.hand:setState("PLAYING")
-    if self.hand.state == Hand.states.PLAYING then
-        self.dealer:update(dt, self.player, self.hand)
-        self.player:update(dt, self.dealer)
-    end
+    self.dealer:update(dt, self.player, self.hand)
+    self.player:update(dt, self.dealer)
 end
 
 function Game:draw()
     self.deck:draw(100, 100)
-
+ 
     self.player:draw()
     self.dealer:displayHand()
 
     self.dealer:displayHandTotal() -- dealer
     self.betZone:draw()
     
+    self.startGame:draw()
 end
 
 function Game:mousepressed(x, y, button, istouch, presses)
     self.player:mousepressed(x, y, button)
+    self.betZone:mousepressed(x, y, button, self.player)
 end
 
 function Game:mousereleased(x, y, button, istouch, presses)
     self.player:mousereleased(x, y, button)
     for _, chip in ipairs(self.player.chips) do
         if Helper.isColliding(chip, self.betZone) then
+            table.remove(self.player.chips, Helper.findIndex(self.player.chips, chip))
             self.betZone:addChip(chip)
         end
     end

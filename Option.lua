@@ -6,14 +6,14 @@ Option.states = {
     INACTIVE = "INACTIVE"
 }
 
-function Option.new(text, x, y, width, height, action)
+function Option.new(text, x, y, width, height, action, state)
     local self = setmetatable({}, Option)
     self.text = text
     self.x = x
     self.y = y
     self.width = width
     self.height = height
-    self.state = Option.states.INACTIVE
+    self.state = state or Option.states.INACTIVE
     self.action = action
     return self
 end

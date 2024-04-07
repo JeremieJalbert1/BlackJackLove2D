@@ -67,7 +67,7 @@ function Player:setCardPosition()
     for i, card in ipairs(self.hand) do
         local x = startX + (i - 1) * (displayConstant.CARD_WIDTH + displayConstant.SPACING_X)
         card.positionOriginal:set(x, startY)
-        if card.isDragging then
+        if card.state == "MOVING" then
             return
         else
             card.targetPosition:set(x, startY)
@@ -85,7 +85,7 @@ function Player:setChipsPosition()
     for i, chip in ipairs(self.chips) do
         local x = startX + (i - 1) * (displayConstant.CHIP_WIDTH + displayConstant.SPACING_X)
         chip.positionOriginal:set(x, startY)
-        if chip.isDragging then
+        if chip.state == "MOVING" then
             return
         else
             chip.targetPosition:set(x, startY)
@@ -117,7 +117,7 @@ end
 function Player:double(dealer)
     self.bet = self.bet * 2
     self:hit(dealer)
-    self:stay()
+    self:stay(dealer)
 end
 
 function Player:split()
