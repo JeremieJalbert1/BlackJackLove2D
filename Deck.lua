@@ -16,8 +16,13 @@ function Deck.new()
 end
 
 function Deck:draw(x, y)
-    local posY = love.graphics.getHeight() / 2 - 70
     love.graphics.draw(self.image, self.quad, self.position.x, self.position.y)
+end
+
+function Deck:resetPosition()
+    for _, card in ipairs(self.cards) do
+        card.position:set(self.position.x, self.position.y)
+    end
 end
 
 function Deck:generate()
@@ -42,7 +47,7 @@ function Deck:generate()
             local x = col * cardWidth
             local y = row * cardHeight
             local quad = love.graphics.newQuad(x, y, cardWidth, cardHeight, suitImages[suit]:getDimensions())
-            table.insert(self.cards, Card:new(suit, value, suitImages[suit], quad, true, Vec2d:new(50, love.graphics.getHeight() / 2 - 70)))
+            table.insert(self.cards, Card:new(suit, value, suitImages[suit], quad, true, Vec2d:new(self.position.x, self.position.y)))
         end
     end
 end

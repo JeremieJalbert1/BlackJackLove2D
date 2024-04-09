@@ -12,6 +12,10 @@ function Vec2d:new(x, y)
     return setmetatable(newObj, self)
 end
 
+function Vec2d:copy()
+    return Vec2d:new(self.x, self.y)
+end
+
 function Vec2d:set(x, y)
     self.x = x
     self.y = y

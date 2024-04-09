@@ -12,9 +12,6 @@ Dealer.states = {
     WAITING = "WAITING",
 }
 
--- TODO: IF DECK IS EMPTY PERFECTLY AFTER THE HAND, THE LAST CARDS STAYS IN THE DECK.
--- TODO: REPOPULATE THE DECK IS NOT WORKING PROPERLY
-
 function Dealer.new(deck)
     local self = setmetatable({}, Dealer)
     self.deck = deck or Deck.new()
@@ -24,7 +21,7 @@ function Dealer.new(deck)
 
     self.dealIndex = 0
     self.actionTimer = 0
-    self.actionDelay = 0.5
+    self.actionDelay = 1
 
     self.chips = {}
     self.money = 1000
@@ -60,13 +57,13 @@ end
 
 function Dealer:resetHand(player)
     for key, card in ipairs(self.hand) do
-        self.endDeck[key] = card
-        self.hand[key] = nil
+        table.insert(self.endDeck, table.remove(self.hand, key))
     end
+    self.hand = {}
     for key, card in ipairs(player.hand) do
-        self.endDeck[key] = card
-        player.hand[key] = nil
+        table.insert(self.endDeck, table.remove(player.hand, key))
     end
+    player.hand = {}
 end
 
 function Dealer:playerWon(player)
@@ -114,11 +111,13 @@ end
 
 function Dealer:dealCard(isFaceUp)
     if #self.deck.cards == 0 then
-        self.deck.cards = self.endDeck
+        for key, card in ipairs(self.endDeck) do
+            self.deck.cards[key] = card
+        end
         self.endDeck = {}
         self:shuffleDeck()
+        self.deck:resetPosition()
     end
-    print(#self.deck.cards)
     return self.deck:dealCard(isFaceUp)
 end
 
