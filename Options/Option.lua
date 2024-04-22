@@ -1,10 +1,6 @@
-Option = {}
-Option.__index = Option
+local middleclass = require("Helpers.middleclass")
 
-Option.states = {
-    ACTIVE = "ACTIVE",
-    INACTIVE = "INACTIVE"
-}
+local Option = middleclass("Option")
 
 function Option.new(text, x, y, width, height, action, state)
     local self = setmetatable({}, Option)
@@ -22,12 +18,15 @@ function Option:setState(state)
     self.state = Option.states[state]
 end
 
+function Option:activate()
+    love.graphics.setColor(0.8, 0.8, 0.8, 0.5) -- Disabled: lower opacity (0.5)
+end
+
+function Option:deactivate()
+    love.graphics.setColor(0.8, 0.8, 0.8, 1) -- Enabled: full opacity
+end
+
 function Option:draw()
-    if self.state == Option.states.INACTIVE then
-        love.graphics.setColor(0.8, 0.8, 0.8, 0.5) -- Disabled: lower opacity (0.5)
-    else
-        love.graphics.setColor(0.8, 0.8, 0.8, 1) -- Enabled: full opacity
-    end
     love.graphics.rectangle("fill", self.x, self.y, self.width, self.height)
 
     -- Text color remains the same, but you might also want to adjust it for disabled state
